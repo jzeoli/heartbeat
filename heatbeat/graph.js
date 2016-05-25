@@ -3,7 +3,7 @@ var heartbeat = function () {
 	var self = this;
 
 	var n = 40,
-			random = d3.random.normal(0, .2),
+			random = d3.random.normal(0, 0),
 			data = d3.range(n).map(random);
 
 		var margin = {
@@ -69,7 +69,8 @@ var heartbeat = function () {
 	************************/
 
 	this.cyclePoint = 0;
-
+    this.interval = 50;
+    this.heartbeat = "normal"
 
 
 	/****************************
@@ -98,7 +99,7 @@ var heartbeat = function () {
 			.attr("d", line)
 			.attr("transform", null)
 			.transition()
-			.duration(100)
+			.duration(this.interval)
 			.ease("linear")
 			.attr("transform", "translate(" + x(-1) + ",0)")
 			.each("end", this.start);
@@ -123,25 +124,25 @@ var heartbeat = function () {
 		if(self.cyclePoint == 0){
 			point = 0;
 
-		} else if (self.cyclePoint == 1) {
+		} else if (self.cyclePoint == 2) {
 			point = -.1;
 
-		} else if(self.cyclePoint == 2){
-			point = -.2;
-
-		} else if(self.cyclePoint == 3){
-			point = .7;
-
 		} else if(self.cyclePoint == 4){
-			point = -.3;
-
-		} else if(self.cyclePoint == 5){
-			point = 0;
+			point = -.15;
 
 		} else if(self.cyclePoint == 6){
+			point = .7;
+
+		} else if(self.cyclePoint == 8){
+			point = -.3;
+
+		} else if(self.cyclePoint == 10){
+			point = 0;
+
+		} else if(self.cyclePoint == 12){
 			point = .15;
 
-		}  else if(self.cyclePoint >= 10){
+		}  else if(self.cyclePoint >=20){
 			self.cyclePoint = -1
 		}
 
