@@ -68,10 +68,11 @@ var heartbeat = function () {
 
 	************************/
 
-	this.cyclePoint = 0;
-    this.interval = 100;
+		this.cyclePoint = 0;
+    this.interval = 50;
     this.heartbeat = "normal"
-
+		this.vals = []
+		this.isInBeat = false;
 
 	/****************************
 
@@ -82,6 +83,40 @@ var heartbeat = function () {
 
 
 	}
+
+	/****************************
+
+	Determine Heartbeat
+
+	****************************/
+this.lastPageViewCount = 0;
+this.lastEventsCount = 0;
+
+this.getBeat = function(pvc, evc){
+	var self = this;
+	var delta = 0;
+
+	if(this.lastPageViewCount < pvc){
+		delta += pvc - this.lastPageViewCount;
+	}
+	if(this.lastEventsCount < evc){
+		delta += evc - this.lastEventsCount;
+	}
+
+	this.vals.push(delta);
+
+	if(this.vals.length > 120){
+		this.vals.splice(0,1);
+	}
+
+	var bpms = 0;
+	for (var i in this.vals){
+		bpms += self.vals[i];
+	}
+
+
+
+}
 
 
 	/****************************
@@ -118,40 +153,44 @@ var heartbeat = function () {
 	****************************/
 
 	this.start = function(){
+			var point = _normal();
 
-		var point = 0;
-
-		if(self.cyclePoint == 0){
-			point = 0;
-
-		} else if (self.cyclePoint == 1) {
-			point = -.1;
-
-		} else if(self.cyclePoint == 2){
-			point = -.15;
-
-		} else if(self.cyclePoint == 3){
-			point = .7;
-
-		} else if(self.cyclePoint == 4){
-			point = -.3;
-
-		} else if(self.cyclePoint == 5){
-			point = 0;
-
-		} else if(self.cyclePoint == 6){
-			point = .15;
-
-		}  else if(self.cyclePoint >=10){
-			self.cyclePoint = -1
-		}
+			self.beat(point);
 
 			self.cyclePoint++;
 
-		self.beat(point);
 	}
 
 
 	this.init();
+
+
+
+ var _normal = function(){
+
+	 var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, .07, .15, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+	 if(self.cyclePoint > nums.length -1){self.cyclePoint = 0}
+
+	 var point = nums[self.cyclePoint];
+
+
+ 	return point;
+
+ }
+
+ var _asystole = function(){
+
+ }
+
+ var _tachycardia = function(){
+
+ }
+
+ var _bradycardia = function(){
+
+ }
+
+
 
 }
