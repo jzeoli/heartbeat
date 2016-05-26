@@ -89,6 +89,7 @@ var heartbeat = function () {
 	Determine Heartbeat
 
 	****************************/
+	//saved vars
 this.lastPageViewCount = 0;
 this.lastEventsCount = 0;
 
@@ -114,7 +115,9 @@ this.getBeat = function(pvc, evc){
 		bpms += self.vals[i];
 	}
 
-
+this.lastPageViewCount = pvc;
+this.lastEventsCount = evc;
+console.log(this.vals);
 
 }
 

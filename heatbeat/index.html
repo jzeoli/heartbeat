@@ -1,128 +1,106 @@
 <html>
-<head>
-	<title>HeartBeat</title>
-	<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <head>
+        <title>HeartBeat</title>
+				<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+        <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
-<style>
+        <style>
 
-svg {
-  font: 10px sans-serif;
-}
+            svg {
+                font: 10px sans-serif;
+            }
 
-.line {
-  fill: none;
-  stroke: #f52a42;
-  stroke-width: 3px;
-}
+            .line {
+                fill: none;
+                stroke: #f52a42;
+                stroke-width: 3px;
+            }
 
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
+            .axis line,
+            .axis path {
+                fill: none;
+                stroke: #000;
+                shape-rendering: crispEdges;
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <script src="graph.js"></script>
+
+        <script>
+
+           var Heartbeat = new heartbeat();
+            Heartbeat.start();
+        </script>
+
+        <!--  ================       ANALYTICS       ======================= -->
+
+        <h1>REPORTING API</h1>
+
+        <button id="auth-button" hidden>Authorize</button>
+
+        <script>
+
+            // Replace with your client ID from the developer console.
+            var CLIENT_ID = '1013491944207-0qq139h021hjo0uop9s49tv2l77bef1a.apps.googleusercontent.com';
+
+            // Set authorized scope.
+            var SCOPES = ['https://www.googleapis.com/auth/analytics.readonly'];
+
+            // Set the discovery URL.
+            var DISCOVERY = 'https://analytics.googleapis.com/$discovery/rest';
+
+            var VIEW_ID = '22895574';
+
+            function authorize(event) {
+                // Handles the authorization flow. `immediate` should be false when invoked from the button click.
+                var useImmdiate = event
+                    ? false
+                    : true;
+                var authData = {
+                    client_id: CLIENT_ID,
+                    scope: SCOPES,
+                    immediate: useImmdiate
+                };
+
+                gapi.auth.authorize(authData, function(response) {
+                    var authButton = document.getElementById('auth-button');
+                    if (response.error) {
+                        authButton.hidden = false;
+                    } else {
+                        authButton.hidden = true;
+                        queryReports();
+                    }
+                });
+            }
+
+            function queryReports() {
+                // Load the API from the client discovery URL.
+                gapi.client.load('analytics', 'v3').then(function() {
+									setInterval(function(){
+										gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:activeUsers" })
+										.execute(function(data){
+											console.log(data)
+											Heartbeat.getBeat(data.result.totalsForAllResults["rt:activeUsers"], 0 * 2)
+										})
+									}, 30000)
 
 
-</style>
-
-	</head>
-
-<body>
+                });
+            }
 
 
-	<script src="graph.js"></script>
 
-	<script>
+            // Add an event listener to the 'auth-button'.
+            document.getElementById('auth-button').addEventListener('click', authorize);
+        </script>
 
-		var Hearbeat = new heartbeat();
-		Hearbeat.start();
+        <script src="https://apis.google.com/js/client.js?onload=authorize"></script>
 
-
-	</script>
-
-<!--  ================       ANALYTICS       ======================= -->
-
-<h1>REPORTING API</h1>
-
-<button id="auth-button" hidden>Authorize</button>
-
-<textarea cols="80" rows="20" id="query-output"></textarea>
-
-<script>
-
-  // Replace with your client ID from the developer console.
-
-  var CLIENT_ID = '1013491944207-0qq139h021hjo0uop9s49tv2l77bef1a.apps.googleusercontent.com';
-
-  // Set authorized scope.
-  var SCOPES = ['https://www.googleapis.com/auth/analytics.readonly'];
-	// Set the discovery URL.
-  var DISCOVERY = 'https://analyticsreporting.googleapis.com/$discovery/rest';
-
-	var VIEW_ID = '22895574';
-
-	  function authorize(event) {
-	    // Handles the authorization flow.
-	    // `immediate` should be false when invoked from the button click.
-	    var useImmdiate = event ? false : true;
-	    var authData = {
-	      client_id: CLIENT_ID,
-	      scope: SCOPES,
-	      immediate: useImmdiate
-	    };
-
-	    gapi.auth.authorize(authData, function(response) {
-	      var authButton = document.getElementById('auth-button');
-	      if (response.error) {
-	        authButton.hidden = false;
-	      }
-	      else {
-	        authButton.hidden = true;
-	        queryReports();
-	      }
-	    });
-	  }
-
-	  function queryReports() {
-	    // Load the API from the client discovery URL.
-	    gapi.client.load(DISCOVERY
-	    ).then(function() {
-
-	        // Call the Analytics Reporting API V4 batchGet method.
-	        gapi.client.analyticsreporting.reports.batchGet( {
-	          "reportRequests":[
-	          {
-	            "viewId":VIEW_ID,
-	            "dateRanges":[
-	              {
-	                "startDate":"30daysAgo",
-	                "endDate":"today"
-	              }],
-	            "metrics":[
-	              {
-	                "expression":"ga:sessions"
-	              },
-								{
-									"expression":"ga:totalEvents"
-								}]
-	          }]
-	        } ).then(function(response) {
-	          var formattedJson = JSON.stringify(response.result, null, 2);
-	          document.getElementById('query-output').value = formattedJson;
-	        })
-	        .then(null, function(err) {
-	            // Log any errors.
-	            console.log(err);
-	        });
-	    });
-	  }
-
-	  // Add an event listener to the 'auth-button'.
-	  document.getElementById('auth-button').addEventListener('click', authorize);
-	</script>
-
-	<script src="https://apis.google.com/js/client.js?onload=authorize"></script>
-
-	</body>
+    </body>
 
 </html>
