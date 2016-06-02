@@ -1,198 +1,256 @@
-var heartbeat = function () {
+var heartbeat = function() {
 
-	var self = this;
+    var self = this;
 
-	var n = 40,
-			random = d3.random.normal(0, 0),
-			data = d3.range(n).map(random);
+    var n = 40,
+        random = d3.random.normal(0, 0),
+        data = d3.range(n).map(random);
 
-		var margin = {
-				top: 20,
-				right: 20,
-				bottom: 20,
-				left: 40
-			},
-			width = 960 - margin.left - margin.right,
-			height = 500 - margin.top - margin.bottom;
+    var margin = {
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 40
+        },
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
 
-		//Width scale of the line graph
-		var x = d3.scale.linear()
-			.domain([0, n - 1])
-			.range([0, width]);
+    //Width scale of the line graph
+    var x = d3.scale.linear()
+        .domain([0, n - 1])
+        .range([0, width]);
 
-		//Height scale of the line graph
-		var y = d3.scale.linear()
-			.domain([-1, 1])
-			.range([height, 0]);
-
-
-		//Build Line
-		var line = d3.svg.line()
-			.interpolate("cardinal")
-			.x(function (d, i) {
-				return x(i);
-			})
-			.y(function (d, i) {
-				return y(d);
-			});
-
-		//Append the SVG to body
-		var svg = d3.select("body").append("svg")
-			.attr("width", width + margin.left + margin.right)
-			.attr("height", height + margin.top + margin.bottom)
-			.append("g")
-			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    //Height scale of the line graph
+    var y = d3.scale.linear()
+        .domain([-1, 1])
+        .range([height, 0]);
 
 
-		//Build ClipPath
-		svg.append("defs").append("clipPath")
-			.attr("id", "clip")
-			.append("rect")
-			.attr("width", width)
-			.attr("height", height);
+    //Build Line
+    var line = d3.svg.line()
+        .interpolate("cardinal")
+        .x(function(d, i) {
+            return x(i);
+        })
+        .y(function(d, i) {
+            return y(d);
+        });
 
-		var path = svg.append("g")
-			.attr("clip-path", "url(#clip)")
-			.append("path")
-			.datum(data)
-			.attr("class", "line")
-			.attr("d", line);
+    //Append the SVG to body
+    var svg = d3.select("body").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 
+    //Build ClipPath
+    svg.append("defs").append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height);
+
+    var path = svg.append("g")
+        .attr("clip-path", "url(#clip)")
+        .append("path")
+        .datum(data)
+        .attr("class", "line")
+        .attr("d", line);
 
 
 
-	/**********************
 
-	Global Vars
 
-	************************/
+    /**********************
 
-		this.cyclePoint = 0;
+    Global Vars
+
+    ************************/
+    this.cyclePoint = 0;
     this.interval = 50;
     this.heartbeat = "normal"
-		this.vals = []
-		this.isInBeat = false;
+    this.vals = [0, 2, 1]
+    this.isInBeat = false;
 
-	/****************************
+    /****************************
 
-	Build Chart Initially
+    Build Chart Initially
 
-	****************************/
-	this.init = function () {
-
-
-	}
-
-	/****************************
-
-	Determine Heartbeat
-
-	****************************/
-	//saved vars
-this.lastPageViewCount = 0;
-this.lastEventsCount = 0;
-
-this.getBeat = function(pvc, evc){
-	var self = this;
-	var delta = 0;
-
-	if(this.lastPageViewCount < pvc){
-		delta += pvc - this.lastPageViewCount;
-	}
-	if(this.lastEventsCount < evc){
-		delta += evc - this.lastEventsCount;
-	}
-
-	this.vals.push(delta);
-
-	if(this.vals.length > 120){
-		this.vals.splice(0,1);
-	}
-
-	var bpms = 0;
-	for (var i in this.vals){
-		bpms += self.vals[i];
-	}
-
-this.lastPageViewCount = pvc;
-this.lastEventsCount = evc;
-console.log(this.vals);
-
-}
+    ****************************/
+    this.init = function() {
 
 
-	/****************************
+    }
 
-	Makes the heart Beat
+    /****************************
 
-	****************************/
+    Determine Heartbeat
 
-	this.beat = function (value) {
-		// push a new data point onto the back
-		data.push(parseFloat(value));
+    ****************************/
+    //saved vars
+    this.lastPageViewCount = 0;
+    this.lastEventsCount = 0;
 
-		// redraw the line, and slide it to the left
-		path
-			.attr("d", line)
-			.attr("transform", null)
-			.transition()
-			.duration(this.interval)
-			.ease("linear")
-			.attr("transform", "translate(" + x(-1) + ",0)")
-			.each("end", this.start);
+    this.getBeat = function(pvc, evc) {
+        var self = this;
+        var delta = 0;
 
-		// pop the old data point off the front
-		data.shift();
+        if (this.lastPageViewCount < pvc) {
+            delta += pvc - this.lastPageViewCount;
+        }
+        if (this.lastEventsCount < evc) {
+            delta += evc - this.lastEventsCount;
+        }
 
-	}
+        this.vals.push(delta);
+
+        if (this.vals.length > 120) {
+            this.vals.splice(0, 1);
+        }
+
+        var bpms = 0;
+        for (var i in this.vals) {
+            bpms += self.vals[i];
+        }
+
+        this.lastPageViewCount = pvc;
+        this.lastEventsCount = evc;
+
+    }
+
+
+    /****************************
+
+    Makes the heart Beat
+
+    ****************************/
+
+    this.beat = function(value) {
+        // push a new data point onto the back
+        data.push(parseFloat(value));
+
+        // redraw the line, and slide it to the left
+        path
+            .attr("d", line)
+            .attr("transform", null)
+            .transition()
+            .duration(this.interval)
+            .ease("linear")
+            .attr("transform", "translate(" + x(-1) + ",0)")
+            .each("end", this.start);
+
+        // pop the old data point off the front
+        data.shift();
+
+    }
 
 
 
-		/****************************
+    /****************************
 
 	Calls the heart Beat
 
 	****************************/
 
-	this.start = function(){
-			var point = _normal();
+    this.start = function() {
 
-			self.beat(point);
+        var func;
+        var sum = 0;
 
-			self.cyclePoint++;
+        for (var x in self.vals) {
+            sum += self.vals[x]
+        }
 
-	}
+        if (sum >= 8 && sum <= 10) {
+            func = _normal();
+        }
+        if (sum <= 2) {
+            func = _asystole();
+        }
+        if (sum > 10) {
+            func = _tachycardia();
+        }
+        if (sum < 8 && sum > 2) {
+            func = _bradycardia();
+        }
+
+        var point = func;
+
+        self.beat(point);
+
+        self.cyclePoint++;
+
+    }
 
 
-	this.init();
+    this.init();
 
 
 
- var _normal = function(){
+    /**************************
 
-	 var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, .07, .15, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    Private Functions: Templates
 
-	 if(self.cyclePoint > nums.length -1){self.cyclePoint = 0}
+    ***************************/
 
-	 var point = nums[self.cyclePoint];
+    var _normal = function() {
+
+        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, .07, .15, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+        if (self.cyclePoint > nums.length - 1) {
+            self.cyclePoint = 0
+        }
+
+        var point = nums[self.cyclePoint];
 
 
- 	return point;
+        return point;
 
- }
+    }
 
- var _asystole = function(){
+    var _asystole = function() {
 
- }
+        var nums = [0];
 
- var _tachycardia = function(){
+        if (self.cyclePoint > nums.length - 1) {
+            self.cyclePoint = 0
+        }
 
- }
+        var point = nums[self.cyclePoint];
 
- var _bradycardia = function(){
+        return point;
 
- }
+    }
+
+    var _tachycardia = function() {
+
+        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, .07, .15, .15, .05, 0, 0];
+
+        if (self.cyclePoint > nums.length - 1) {
+            self.cyclePoint = 0
+        }
+
+        var point = nums[self.cyclePoint];
+
+
+        return point;
+
+    }
+
+    var _bradycardia = function() {
+        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, .07, .15, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+        if (self.cyclePoint > nums.length - 1) {
+            self.cyclePoint = 0
+        }
+
+        var point = nums[self.cyclePoint];
+
+
+        return point;
+
+    }
 
 
 

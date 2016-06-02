@@ -39,8 +39,6 @@
 
         <!--  ================       ANALYTICS       ======================= -->
 
-        <h1>REPORTING API</h1>
-
         <button id="auth-button" hidden>Authorize</button>
 
         <script>
@@ -82,10 +80,10 @@
                 // Load the API from the client discovery URL.
                 gapi.client.load('analytics', 'v3').then(function() {
 									setInterval(function(){
-										gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:activeUsers" })
+										gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:activeUsers,rt:goal1Completions" })
 										.execute(function(data){
 											console.log(data)
-											Heartbeat.getBeat(data.result.totalsForAllResults["rt:activeUsers"], 0 * 2)
+											Heartbeat.getBeat(data.result.totalsForAllResults["rt:activeUsers"], data.result.totalsForAllResults["rt:goal1Completions"] * 2)
 										})
 									}, 30000)
 
