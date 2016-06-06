@@ -23,6 +23,14 @@
                 shape-rendering: crispEdges;
             }
 
+            body {
+              background:url(graph-paper-background.gif) center;
+              margin:0;
+              padding:0;
+              height:100%;
+              width:100%;
+
+            }
         </style>
 
     </head>
@@ -77,20 +85,36 @@
             }
 
             function queryReports() {
-                // Load the API from the client discovery URL.
+
+
                 gapi.client.load('analytics', 'v3').then(function() {
-									setInterval(function(){
-										gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:activeUsers,rt:goal1Completions" })
-										.execute(function(data){
-											console.log(data)
-											Heartbeat.getBeat(data.result.totalsForAllResults["rt:activeUsers"], data.result.totalsForAllResults["rt:goal1Completions"] * 2)
-										})
-									}, 30000)
+
+                  var goalCoversions = 0;
+
+                  // Get Current Active Users
+                  setTimeout(function(){
+                    setInterval(function(){
+  										gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:activeUsers" })
+  										.execute(function(data){
+  											Heartbeat.getBeat(data.result.totalsForAllResults["rt:activeUsers"], goalCoversions);
+  										});
+  									}, 15000);
+
+
+                  }, 15000);
+
+
+
+                  //Get Goal Conversions
+                  setInterval(function(){
+                    gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:goalCompletionsAll" })
+                    .execute(function(data){
+                      goalCoversions = data.result.totalsForAllResults["rt:goalCompletionsAll"];
+                    });
+                  }, 15000);
 
                 });
             }
-
-
 
             // Add an event listener to the 'auth-button'.
             document.getElementById('auth-button').addEventListener('click', authorize);

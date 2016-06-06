@@ -12,7 +12,7 @@ var heartbeat = function() {
             bottom: 20,
             left: 40
         },
-        width = 960 - margin.left - margin.right,
+        width = window.innerWidth - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
 
     //Width scale of the line graph
@@ -60,8 +60,6 @@ var heartbeat = function() {
 
 
 
-
-
     /**********************
 
     Global Vars
@@ -70,7 +68,7 @@ var heartbeat = function() {
     this.cyclePoint = 0;
     this.interval = 50;
     this.heartbeat = "normal"
-    this.vals = [0, 2, 1]
+    this.vals = [];
     this.isInBeat = false;
 
     /****************************
@@ -93,6 +91,9 @@ var heartbeat = function() {
     this.lastEventsCount = 0;
 
     this.getBeat = function(pvc, evc) {
+        //Weight the goal conversions
+        evc = evc * 2;
+
         var self = this;
         var delta = 0;
 
@@ -105,7 +106,7 @@ var heartbeat = function() {
 
         this.vals.push(delta);
 
-        if (this.vals.length > 120) {
+        if (this.vals.length > 30) {
             this.vals.splice(0, 1);
         }
 
@@ -136,7 +137,6 @@ var heartbeat = function() {
             .attr("transform", null)
             .transition()
             .duration(this.interval)
-            .ease("linear")
             .attr("transform", "translate(" + x(-1) + ",0)")
             .each("end", this.start);
 
@@ -147,9 +147,9 @@ var heartbeat = function() {
 
 
 
-    /****************************
+  /****************************
 
-	Calls the heart Beat
+	Calls the Heart Beat
 
 	****************************/
 
@@ -196,7 +196,7 @@ var heartbeat = function() {
 
     var _normal = function() {
 
-        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, .07, .15, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, 0, .1, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         if (self.cyclePoint > nums.length - 1) {
             self.cyclePoint = 0
@@ -225,7 +225,7 @@ var heartbeat = function() {
 
     var _tachycardia = function() {
 
-        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, .07, .15, .15, .05, 0, 0];
+        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, 0, .1, .15, .05, 0, 0];
 
         if (self.cyclePoint > nums.length - 1) {
             self.cyclePoint = 0
@@ -239,14 +239,13 @@ var heartbeat = function() {
     }
 
     var _bradycardia = function() {
-        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, .07, .15, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, 0, .1, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         if (self.cyclePoint > nums.length - 1) {
             self.cyclePoint = 0
         }
 
         var point = nums[self.cyclePoint];
-
 
         return point;
 
