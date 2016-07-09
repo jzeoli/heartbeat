@@ -2,7 +2,7 @@ var heartbeat = function() {
 
     var self = this;
 
-    var n = 40,
+    var n = 80,
         random = d3.random.normal(0, 0),
         data = d3.range(n).map(random);
 
@@ -66,10 +66,11 @@ var heartbeat = function() {
 
     ************************/
     this.cyclePoint = 0;
-    this.interval = 50;
+    this.interval = 20;
     this.heartbeat = "normal"
     this.vals = [];
     this.isInBeat = false;
+    this.inHistory = [];
 
     /****************************
 
@@ -106,7 +107,7 @@ var heartbeat = function() {
 
         this.vals.push(delta);
 
-        if (this.vals.length > 30) {
+        if (this.vals.length > 10) {
             this.vals.splice(0, 1);
         }
 
@@ -117,7 +118,6 @@ var heartbeat = function() {
 
         this.lastPageViewCount = pvc;
         this.lastEventsCount = evc;
-
     }
 
 
@@ -137,6 +137,7 @@ var heartbeat = function() {
             .attr("transform", null)
             .transition()
             .duration(this.interval)
+            .ease("linear")
             .attr("transform", "translate(" + x(-1) + ",0)")
             .each("end", this.start);
 
@@ -144,8 +145,6 @@ var heartbeat = function() {
         data.shift();
 
     }
-
-
 
   /****************************
 
@@ -162,17 +161,25 @@ var heartbeat = function() {
             sum += self.vals[x]
         }
 
-        if (sum >= 8 && sum <= 10) {
+        if (sum >= 8 && sum <= 16) {
             func = _normal();
+            self.heartbeat = "Normal";
+            $('#type').text("Normal");
         }
         if (sum <= 2) {
             func = _asystole();
+            self.heartbeat = "Asystole";
+            $('#type').text("Asystole");
         }
-        if (sum > 10) {
+        if (sum > 16) {
             func = _tachycardia();
+            self.heartbeat = "Tachycardia";
+            $('#type').text("Tachycardia");
         }
         if (sum < 8 && sum > 2) {
             func = _bradycardia();
+            self.heartbeat="Bradycardia";
+            $('#type').text("Bradycardia");
         }
 
         var point = func;
@@ -196,7 +203,7 @@ var heartbeat = function() {
 
     var _normal = function() {
 
-        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, 0, .1, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var nums = [0, .05, .08, .05, 0, 0, 0, -.2, .7, -.3, -.03, 0, 0, 0, 0, .06, .13, .15, .13, .06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         if (self.cyclePoint > nums.length - 1) {
             self.cyclePoint = 0
@@ -225,7 +232,7 @@ var heartbeat = function() {
 
     var _tachycardia = function() {
 
-        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, 0, .1, .15, .05, 0, 0];
+        var nums = [0, .05, .08, .05, 0, 0, 0, -.2, .7, -.3, -.03, 0, 0, 0, 0, .06, .13, .15, .13, .06, 0, 0];
 
         if (self.cyclePoint > nums.length - 1) {
             self.cyclePoint = 0
@@ -239,7 +246,7 @@ var heartbeat = function() {
     }
 
     var _bradycardia = function() {
-        var nums = [0, .1, 0, -.15, -.2, .7, -.3, -.03, 0, 0, .1, .15, .05, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var nums = [0, .05, .08, .05, 0, 0, 0, -.2, .7, -.3, -.03, 0, 0, 0, 0, .06, .13, .15, .13, .06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         if (self.cyclePoint > nums.length - 1) {
             self.cyclePoint = 0
