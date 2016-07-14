@@ -94,11 +94,14 @@ var heartbeat = function() {
 
     this.getBeat = function(pvc, evc) {
 
+        evc = parseInt(evc);
+        pvc = parseInt(pvc);
+
         //Weight the goal conversions
         evc = evc * 2;
 
-        var self = this;
         var delta = 0;
+        var total = pvc + evc;
 
         if (this.lastPageViewCount < pvc) {
             delta += pvc - this.lastPageViewCount;
@@ -108,7 +111,6 @@ var heartbeat = function() {
         }
 
         this.vals.push(delta);
-
         //Newer Code using past data
         this.inHistory.push(delta);
         this.lastDelta = delta;
@@ -287,9 +289,6 @@ var heartbeat = function() {
 
 
 
-
-
-
     this.init();
 
 
@@ -309,7 +308,6 @@ var heartbeat = function() {
         }
 
         var point = nums[self.cyclePoint];
-
 
         return point;
 
