@@ -1,0 +1,48 @@
+
+
+            svg {
+                font: 10px sans-serif;
+            }
+
+            .line {
+                fill: none;
+                stroke: #f52a42;
+                stroke-width: 3px;
+            }
+
+            .axis line,
+            .axis path {
+                fill: none;
+                stroke: #000;
+                shape-rendering: crispEdges;
+            }
+
+            body {
+              background:url(graph-paper-background.gif) center;
+              margin:0;
+              padding:30px;
+              height:100%;
+              width:100%;
+
+            }
+
+h1{
+    font-family: 'Passion One', cursive;
+    font-weight: normal;
+}
+
+#auth-button{
+    background:#f52a42;
+    border:none;
+    color:#fff;
+    padding:10px 15px;
+    font-family: 'Passion One', cursive;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background .3s ease;
+}
+
+#auth-button:hover{
+    background:#000;
+
+}

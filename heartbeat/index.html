@@ -3,35 +3,8 @@
         <title>HeartBeat</title>
 				<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
-
-        <style>
-
-            svg {
-                font: 10px sans-serif;
-            }
-
-            .line {
-                fill: none;
-                stroke: #f52a42;
-                stroke-width: 3px;
-            }
-
-            .axis line,
-            .axis path {
-                fill: none;
-                stroke: #000;
-                shape-rendering: crispEdges;
-            }
-
-            body {
-              background:url(graph-paper-background.gif) center;
-              margin:0;
-              padding:0;
-              height:100%;
-              width:100%;
-
-            }
-        </style>
+        <link href="https://fonts.googleapis.com/css?family=Passion+One" rel="stylesheet">
+       <link href="style.css" rel="stylesheet">
 
     </head>
 
@@ -40,9 +13,10 @@
         <script src="graph.js"></script>
 
 
-<h1>Heartbeat type: <span id="type">Asystole</span>
-        <script>
+        <h1>Heartbeat type:
+        <span id="type">Asystole</span>
 
+        <script>
            var Heartbeat = new heartbeat();
             Heartbeat.start();
         </script>
@@ -86,37 +60,37 @@
                 });
             }
 
-            function queryReports() {
 
+            function queryReports() {
 
                 gapi.client.load('analytics', 'v3').then(function() {
 
-                  var goalCoversions = 0;
+                  var goalConversions = 0;
 
-                  // Get Current Active Users
+                    //Get Goal Conversions First and Save
+                  setInterval(function(){
+                    gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:goalCompletionsAll" })
+                    .execute(function(data){
+                      goalConversions = data.result.totalsForAllResults["rt:goalCompletionsAll"];
+                    });
+                  }, 15000);
+
+
+                  // Get Current Active Users and update
                   setTimeout(function(){
                     setInterval(function(){
   										gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:activeUsers" })
   										.execute(function(data){
-  											Heartbeat.getBeat(data.result.totalsForAllResults["rt:activeUsers"], goalCoversions);
+  											Heartbeat.getBeat(data.result.totalsForAllResults["rt:activeUsers"], goalConversions);
   										});
   									}, 15000);
 
-
                   }, 15000);
 
+   });
 
-
-                  //Get Goal Conversions
-                  setInterval(function(){
-                    gapi.client.analytics.data.realtime.get({"ids": "ga:22895574", "metrics": "rt:goalCompletionsAll" })
-                    .execute(function(data){
-                      goalCoversions = data.result.totalsForAllResults["rt:goalCompletionsAll"];
-                    });
-                  }, 15000);
-
-                });
             }
+
 
             // Add an event listener to the 'auth-button'.
             document.getElementById('auth-button').addEventListener('click', authorize);

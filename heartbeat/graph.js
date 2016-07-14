@@ -8,9 +8,9 @@ var heartbeat = function() {
 
     var margin = {
             top: 20,
-            right: 20,
+            right: 100,
             bottom: 20,
-            left: 40
+            left: 0
         },
         width = window.innerWidth - margin.left - margin.right,
         height = 500 - margin.top - margin.bottom;
@@ -66,11 +66,12 @@ var heartbeat = function() {
 
     ************************/
     this.cyclePoint = 0;
-    this.interval = 20;
+    this.interval = 40;
     this.heartbeat = "normal"
     this.vals = [];
     this.isInBeat = false;
     this.inHistory = [];
+    this.lastDelta = 0;
 
     /****************************
 
@@ -92,6 +93,7 @@ var heartbeat = function() {
     this.lastEventsCount = 0;
 
     this.getBeat = function(pvc, evc) {
+
         //Weight the goal conversions
         evc = evc * 2;
 
@@ -107,6 +109,10 @@ var heartbeat = function() {
 
         this.vals.push(delta);
 
+        //Newer Code using past data
+        this.inHistory.push(delta);
+        this.lastDelta = delta;
+
         if (this.vals.length > 10) {
             this.vals.splice(0, 1);
         }
@@ -118,6 +124,8 @@ var heartbeat = function() {
 
         this.lastPageViewCount = pvc;
         this.lastEventsCount = evc;
+
+
     }
 
 
@@ -146,6 +154,44 @@ var heartbeat = function() {
 
     }
 
+
+      /****************************
+
+	Gets average from history
+
+	****************************/
+
+    this.getAverage = function(){
+
+        var sum = 0;
+        for( var i = 0; i < this.inHistory.length; i++ ){
+            sum += parseInt( this.inHistory[i], 10 ); //don't forget to add the base
+        }
+
+        var avg = sum/this.inHistory.length;
+
+        return avg;
+
+    }
+
+
+    /****************************
+
+	Gets max value from history
+
+	****************************/
+    this.getMax = function(){
+
+        if(self.inHistory.length > 0){
+        return Math.max.apply(null, self.inHistory);
+        }
+        else {
+            return 0;
+        }
+
+    }
+
+
   /****************************
 
 	Calls the Heart Beat
@@ -156,12 +202,17 @@ var heartbeat = function() {
 
         var func;
         var sum = 0;
+        var avg = self.getAverage();
+        var max = self.getMax();
 
+
+        //Old code
         for (var x in self.vals) {
             sum += self.vals[x]
         }
 
-        if (sum >= 8 && sum <= 16) {
+
+      /*  if (sum >= 8 && sum <= 16) {
             func = _normal();
             self.heartbeat = "Normal";
             $('#type').text("Normal");
@@ -181,6 +232,50 @@ var heartbeat = function() {
             self.heartbeat="Bradycardia";
             $('#type').text("Bradycardia");
         }
+        */
+
+        if (self.inHistory.length==0 || self.lastDelta <= 0) {
+
+            var sumLastThree = 0;
+
+            if(self.inHistory.length>=3){
+                var arrHolder = self.inHistory;
+                var lastThree = arrHolder.slice(-3);
+                sumLastThree = lastThree[0] + lastThree[1] + lastThree[2];
+            }
+
+            if(sumLastThree == 0){
+                func = _asystole();
+                self.heartbeat = "Asystole";
+                $('#type').text("Asystole");
+            } else{
+                func = _bradycardia();
+                self.heartbeat="Bradycardia";
+                $('#type').text("Bradycardia");
+            }
+
+        }
+
+        else if (self.lastDelta  > 0 && self.lastDelta <= (avg/2)) {
+            func = _bradycardia();
+            self.heartbeat="Bradycardia";
+            $('#type').text("Bradycardia");
+        }
+
+
+        else if ( self.lastDelta > (avg/2) && self.lastDelta < (max/2) ) {
+            func = _normal();
+            self.heartbeat = "Normal";
+            $('#type').text("Normal");
+        }
+
+       else if ( self.lastDelta >= (max/2) ) {
+            func = _tachycardia();
+            self.heartbeat = "Tachycardia";
+            $('#type').text("Tachycardia");
+
+        }
+
 
         var point = func;
 
@@ -189,6 +284,10 @@ var heartbeat = function() {
         self.cyclePoint++;
 
     }
+
+
+
+
 
 
     this.init();
@@ -232,7 +331,7 @@ var heartbeat = function() {
 
     var _tachycardia = function() {
 
-        var nums = [0, .05, .08, .05, 0, 0, 0, -.2, .7, -.3, -.03, 0, 0, 0, 0, .06, .13, .15, .13, .06, 0, 0];
+        var nums = [0, .05, .08, .05, 0, 0, 0, -.2, .7, -.3, -.03, 0, 0, 0, 0, .06, .13, .15, .13, .06];
 
         if (self.cyclePoint > nums.length - 1) {
             self.cyclePoint = 0
@@ -246,7 +345,7 @@ var heartbeat = function() {
     }
 
     var _bradycardia = function() {
-        var nums = [0, .05, .08, .05, 0, 0, 0, -.2, .7, -.3, -.03, 0, 0, 0, 0, .06, .13, .15, .13, .06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        var nums = [0, .05, .08, .05, 0, 0, 0, -.2, .7, -.3, -.03, 0, 0, 0, 0, .06, .13, .15, .13, .06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
         if (self.cyclePoint > nums.length - 1) {
             self.cyclePoint = 0
